@@ -806,6 +806,9 @@
     <ClInclude Include="src\vendor\glm\vector_relational.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="src\camera.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\image\container.jpg">
