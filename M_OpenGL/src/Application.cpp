@@ -55,8 +55,6 @@ int main()
 	glfwSetScrollCallback(window, scroll_callback);
 	//隐藏光标
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-	//开启隐藏
-	glEnable(GL_DEPTH_TEST);
 
 
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
@@ -65,57 +63,71 @@ int main()
 		return -1;
 	}
 
+	//开启隐藏
+	glEnable(GL_DEPTH_TEST);
+
+		
+	// 检查 cameraFront 初始值是否有效
+	std::cout << "[DEBUG] cameraFront = "
+		<< cameraFront.x << ", "
+		<< cameraFront.y << ", "
+		<< cameraFront.z << std::endl;
+
+	std::cout << "[DEBUG] Starting shader load..." << std::endl;
 	Shader m_shader("res/Shader/Basic.shader");
-	float offset = 0.5f;
-	m_shader.setFloat("xOffset", offset);
+	if (m_shader.GetID() == 0) {
+		std::cerr << "Shader program creation failed, exiting..." << std::endl;
+		return -1;
+	}
+	std::cout << "[DEBUG] Shader compiled and linked." << std::endl;
 
 	float vertices[] = {
-//     ---- 位置 ----       ---- 颜色 ----     - 纹理坐标 -
-		// 0.5f,  0.5f, 0.0f,   1.0f, 1.0f, // top right
-		// 0.5f, -0.5f, 0.0f,   1.0f, 0.0f, // bottom right
-		//-0.5f, -0.5f, 0.0f,   0.0f, 0.0f, // bottom left
-		//-0.5f,  0.5f, 0.0f,   0.0f, 1.0f  // top left 
+		//     ---- 位置 ----       ---- 颜色 ----     - 纹理坐标 -
+				// 0.5f,  0.5f, 0.0f,   1.0f, 1.0f, // top right
+				// 0.5f, -0.5f, 0.0f,   1.0f, 0.0f, // bottom right
+				//-0.5f, -0.5f, 0.0f,   0.0f, 0.0f, // bottom left
+				//-0.5f,  0.5f, 0.0f,   0.0f, 1.0f  // top left 
+					-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+			 0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+			 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+			 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+			-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
 			-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-	 0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-	 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-	 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-	-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-	-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
 
-	-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-	 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-	 0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-	 0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-	-0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
-	-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+			-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+			 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+			 0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+			 0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+			-0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
+			-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
 
-	-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-	-0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-	-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-	-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-	-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-	-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+			-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+			-0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+			-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+			-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+			-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+			-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
 
-	 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-	 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-	 0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-	 0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-	 0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-	 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+			 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+			 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+			 0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+			 0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+			 0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+			 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
 
-	-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-	 0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
-	 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-	 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-	-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-	-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+			-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+			 0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
+			 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+			 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+			-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+			-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
 
-	-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-	 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-	 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-	 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-	-0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
-	-0.5f,  0.5f, -0.5f,  0.0f, 1.0f
+			-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+			 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+			 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+			 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+			-0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
+			-0.5f,  0.5f, -0.5f,  0.0f, 1.0f
 	};
 	unsigned int indices[] = {
 		0,1,3,
@@ -139,7 +151,7 @@ int main()
 	//VAO VBO
 	unsigned int VBO;
 	unsigned int VAO;
-	unsigned int EBO;
+	//unsigned int EBO;
 
 	glGenVertexArrays(1, &VAO);
 	if (VAO == 0) {
@@ -151,19 +163,19 @@ int main()
 		std::cerr << "Failed to generate VBO" << std::endl;
 		return -1;
 	}
-	glGenBuffers(1, &EBO);
+	//glGenBuffers(1, &EBO);
 
 	glBindVertexArray(VAO);
 
-	glBindBuffer(GL_ARRAY_BUFFER,VBO);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER,sizeof(indices),indices,GL_STATIC_DRAW);
+	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,EBO);
+	//glBufferData(GL_ELEMENT_ARRAY_BUFFER,sizeof(indices),indices,GL_STATIC_DRAW);
 
 	//位置属性
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(0);					
+	glEnableVertexAttribArray(0);
 	//颜色属性										
 	//glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
 	//glEnableVertexAttribArray(1);
@@ -173,10 +185,10 @@ int main()
 
 
 	//纹理
-	unsigned int texture1,texture2;
+	unsigned int texture1, texture2;
 
 	glGenTextures(1, &texture1);
-	glBindTexture(GL_TEXTURE_2D,texture1);
+	glBindTexture(GL_TEXTURE_2D, texture1);
 	// 为当前绑定的纹理对象设置环绕、过滤方式
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT); // note that we set the container wrapping method to GL_CLAMP_TO_EDGE
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -210,7 +222,7 @@ int main()
 	data = stbi_load("res/image/awesomeface.png", &width, &height, &nrChannels, 0);
 	if (data)
 	{
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
 		glGenerateMipmap(GL_TEXTURE_2D);
 	}
 	else
@@ -222,8 +234,8 @@ int main()
 	m_shader.use();
 	m_shader.setInt("texture1", 0);
 	m_shader.setInt("texture2", 1);
-	
-	
+
+
 	//循环渲染
 	while (!glfwWindowShouldClose(window))
 	{
@@ -244,7 +256,7 @@ int main()
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, texture2);
 
-		m_shader.setFloat("mixValue", mixValue);
+
 		//绘制三角形
 		//线框模式(Wireframe Mode)
 		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -253,27 +265,34 @@ int main()
 		//transform = glm::rotate(transform, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
 		//transform = glm::translate(transform, glm::vec3(0.5f, -0.5f, 0.0f));
 		m_shader.use();
-		
+
+		m_shader.setFloat("mixValue", mixValue);
+
 		//glm::mat4 model;
 		//model = glm::rotate(model,(float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
 
 		//glm::mat4 view;
 		//view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+		if (glm::any(glm::isnan(cameraFront))) {
+			std::cerr << "[FATAL] cameraFront contains NaN: "
+				<< cameraFront.x << ", " << cameraFront.y << ", " << cameraFront.z << std::endl;
+			return -1;
+		}
 		glm::mat4 view;
-		view = glm::lookAt(cameraPos, cameraFront+cameraPos, cameraUp);
+		view = glm::lookAt(cameraPos, cameraFront + cameraPos, cameraUp);
 		m_shader.setMat4("view", view);
 
 		glm::mat4 projection;
-		projection = glm::perspective(glm::radians(fov),(float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+		projection = glm::perspective(glm::radians(fov), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
 		m_shader.setMat4("projection", projection);
 
 		// get matrix's uniform location and set matrix
 
 		//unsigned int transformLoc = glGetUniformLocation(m_shader.GetID(), "transform");
 		//glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transform));
-    	//m_shader.setMat4("model", model);
-		
-		glBindVertexArray(VAO);
+		//m_shader.setMat4("model", model);
+
+		//glBindVertexArray(VAO);
 		//glDrawArrays(GL_TRIANGLES, 0, 36);
 		glBindVertexArray(VAO);
 		for (unsigned int i = 0; i < 10; i++)
@@ -281,20 +300,21 @@ int main()
 			glm::mat4 model;
 			model = glm::translate(model, cubePositions[i]);
 			float angle = 20.0f * i;
-			if (i % 3 == 0 || i ==1) 
+			if (i % 3 == 0 || i == 1)
 			{
 				model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
-			}else{
+			}
+			else {
 				model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
 			}
-			
+
 			m_shader.setMat4("model", model);
 
 			glDrawArrays(GL_TRIANGLES, 0, 36);
 		}
 		//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
-		
+
 		// float timeValue = glfwGetTime();
 		// float greenValue = (sin(timeValue) / 2.0f) + 0.5f;
 		// int vertexColorLocation = glGetUniformLocation(shaderProgramYellow, "ourColor");
@@ -311,8 +331,8 @@ int main()
 		glfwPollEvents();
 	}
 	//清理
-	glDeleteBuffers(1,&VBO);
-	glDeleteVertexArrays(1,&VAO);
+	glDeleteBuffers(1, &VBO);
+	glDeleteVertexArrays(1, &VAO);
 	//glDeleteBuffers(1,&EBO);
 	//glDeleteProgram(shaderProgram);
 
@@ -381,6 +401,7 @@ void mouse_callback(GLFWwindow* window, double xposIn, double yposIn)
 	front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
 	front.y = sin(glm::radians(pitch));
 	front.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+	std::cout << "cameraFront = " << cameraFront.x << ", " << cameraFront.y << ", " << cameraFront.z << std::endl;
 	cameraFront = glm::normalize(front);
 }
 

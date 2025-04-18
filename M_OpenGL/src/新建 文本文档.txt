@@ -51,8 +51,8 @@ int main()
 	glfwMakeContextCurrent(window);
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 	//监视鼠标
-	glfwSetCursorPosCallback(window, mouse_callback);
-	glfwSetScrollCallback(window, scroll_callback);
+	//	glfwSetCursorPosCallback(window, mouse_callback);
+	//glfwSetScrollCallback(window, scroll_callback);
 	//隐藏光标
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	//开启隐藏
@@ -65,9 +65,13 @@ int main()
 		return -1;
 	}
 
+	std::cout << "[DEBUG] Starting shader load..." << std::endl;
 	Shader m_shader("res/Shader/Basic.shader");
-	float offset = 0.5f;
-	m_shader.setFloat("xOffset", offset);
+	if (m_shader.GetID() == 0) {
+		std::cerr << "Shader program creation failed, exiting..." << std::endl;
+		return -1;
+	}
+	std::cout << "[DEBUG] Shader compiled and linked." << std::endl;
 
 	float vertices[] = {
 //     ---- 位置 ----       ---- 颜色 ----     - 纹理坐标 -
@@ -139,7 +143,7 @@ int main()
 	//VAO VBO
 	unsigned int VBO;
 	unsigned int VAO;
-	unsigned int EBO;
+	//unsigned int EBO;
 
 	glGenVertexArrays(1, &VAO);
 	if (VAO == 0) {
@@ -151,15 +155,15 @@ int main()
 		std::cerr << "Failed to generate VBO" << std::endl;
 		return -1;
 	}
-	glGenBuffers(1, &EBO);
+	//glGenBuffers(1, &EBO);
 
 	glBindVertexArray(VAO);
 
 	glBindBuffer(GL_ARRAY_BUFFER,VBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER,sizeof(indices),indices,GL_STATIC_DRAW);
+	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,EBO);
+	//glBufferData(GL_ELEMENT_ARRAY_BUFFER,sizeof(indices),indices,GL_STATIC_DRAW);
 
 	//位置属性
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
@@ -244,7 +248,7 @@ int main()
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, texture2);
 
-		m_shader.setFloat("mixValue", mixValue);
+		
 		//绘制三角形
 		//线框模式(Wireframe Mode)
 		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -253,12 +257,19 @@ int main()
 		//transform = glm::rotate(transform, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
 		//transform = glm::translate(transform, glm::vec3(0.5f, -0.5f, 0.0f));
 		m_shader.use();
+
+		m_shader.setFloat("mixValue", mixValue);
 		
 		//glm::mat4 model;
 		//model = glm::rotate(model,(float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
 
 		//glm::mat4 view;
 		//view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+		if (glm::any(glm::isnan(cameraFront))) {
+			std::cerr << "[FATAL] cameraFront contains NaN: "
+				<< cameraFront.x << ", " << cameraFront.y << ", " << cameraFront.z << std::endl;
+			return -1;
+		}
 		glm::mat4 view;
 		view = glm::lookAt(cameraPos, cameraFront+cameraPos, cameraUp);
 		m_shader.setMat4("view", view);
@@ -273,7 +284,7 @@ int main()
 		//glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transform));
     	//m_shader.setMat4("model", model);
 		
-		glBindVertexArray(VAO);
+		//glBindVertexArray(VAO);
 		//glDrawArrays(GL_TRIANGLES, 0, 36);
 		glBindVertexArray(VAO);
 		for (unsigned int i = 0; i < 10; i++)
@@ -381,6 +392,7 @@ void mouse_callback(GLFWwindow* window, double xposIn, double yposIn)
 	front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
 	front.y = sin(glm::radians(pitch));
 	front.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+	std::cout << "cameraFront = " << cameraFront.x << ", " << cameraFront.y << ", " << cameraFront.z << std::endl;
 	cameraFront = glm::normalize(front);
 }
 
@@ -488,8 +500,21 @@ void Shader::setFloat(const std::string& name, float value) const
 
 void Shader::setMat4(const std::string& name, const glm::mat4& value) const
 {
-    glUniformMatrix4fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE, glm::value_ptr(value));
+	int location = glGetUniformLocation(ID, name.c_str());
+	if (location == -1) {
+		std::cerr << "[WARNING] Uniform '" << name << "' not found or inactive." << std::endl;
+		return;
+	}
+
+	if (glm::any(glm::isnan(value[0])) || glm::any(glm::isnan(value[1])) ||
+		glm::any(glm::isnan(value[2])) || glm::any(glm::isnan(value[3]))) {
+		std::cerr << "[FATAL] Uniform '" << name << "' contains NaN matrix, skipping set." << std::endl;
+		return;
+	}
+
+	glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(value));
 }
+
 
 ShaderProgramSource Shader::ParseShader(const std::string filepath)
 {
@@ -536,13 +561,13 @@ unsigned int Shader::CompileShader(unsigned int type, const std::string& source)
 	{
 		int length;
 		glGetShaderiv(id, GL_INFO_LOG_LENGTH, &length);
-		char* message = (char*)malloc(length * sizeof(char));
+		char* message = new char[length];
 		glGetShaderInfoLog(id, length, &length, message);
-
-		std::cout << "Failed to compile " << (type == GL_VERTEX_SHADER ? "vertex" : "fragment") << " shader" << std::endl;
-		std::cout << message << std::endl;
-
+		std::cout << "Failed to compile " << (type == GL_VERTEX_SHADER ? "vertex" : "fragment") << " shader\n"
+			<< message << std::endl;
+		delete[] message;
 		glDeleteShader(id);
+		return 0;
 	}
 
 	return id;
@@ -554,10 +579,24 @@ unsigned int Shader::CreateShader(const std::string& vertexShader, const std::st
 	unsigned int vs = CompileShader(GL_VERTEX_SHADER, vertexShader);
 	unsigned int fs = CompileShader(GL_FRAGMENT_SHADER,fragmentShader);
 
+	if (vs == 0 || fs == 0) {
+		std::cerr << "[CreateShader] Shader compile failed!" << std::endl;
+		return 0;
+	}
+
 	glAttachShader(program,vs);
 	glAttachShader(program,fs);
 	glLinkProgram(program);
-	glValidateProgram(program);
+
+	int success;
+	glGetProgramiv(program, GL_LINK_STATUS, &success);
+	if (!success) {
+		char infoLog[512];
+		glGetProgramInfoLog(program, 512, NULL, infoLog);
+		std::cerr << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
+		return 0;
+	}
+
 
 	glDeleteShader(vs);
 	glDeleteShader(fs);
@@ -570,31 +609,25 @@ unsigned int Shader::CreateShader(const std::string& vertexShader, const std::st
 #shader vertex
 #version 330 core
 layout (location = 0) in vec3 aPos;
-//layout (location = 1) in vec3 aColor;
 layout (location = 1) in vec2 aTexCoord;
 
-//out vec3 ourColor;
 out vec2 TexCoord;
 
-uniform float xOffset;
-//uniform mat4 transform;
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
 
 void main()
 {
-   gl_Position = projection * view * model * vec4(aPos, 1.0);
-  // ourColor = aColor;
-   TexCoord = aTexCoord;
-};
+    gl_Position = projection * view * model * vec4(aPos, 1.0);
+    TexCoord = aTexCoord;
+}
 
 #shader fragment
 #version 330 core
 out vec4 FragColor;
 
-in  vec3 ourColor;
-in  vec2 TexCoord;
+in vec2 TexCoord;
 
 uniform sampler2D texture1;
 uniform sampler2D texture2;
@@ -602,5 +635,5 @@ uniform float mixValue;
 
 void main()
 {
-FragColor = mix(texture(texture1,TexCoord),texture(texture2,TexCoord),mixValue);
-};
+    FragColor = mix(texture(texture1, TexCoord), texture(texture2, TexCoord), mixValue);
+}

@@ -1,7 +1,7 @@
 #include"shader.h"
 
 Shader::Shader(const std::string filepath)
-	:FilePath(filepath),ID(0)
+	:FilePath(filepath), ID(0)
 {
 	ShaderProgramSource source = ParseShader(filepath);
 	ID = CreateShader(source.vertexSource, source.fragmentSource);
@@ -24,7 +24,7 @@ unsigned int Shader::GetID()
 
 void Shader::setBool(const std::string& name, bool value) const
 {
-	glUniform1i(glGetUniformLocation(ID,name.c_str()),(int)value);
+	glUniform1i(glGetUniformLocation(ID, name.c_str()), (int)value);
 }
 
 void Shader::setInt(const std::string& name, int value) const
@@ -41,8 +41,21 @@ void Shader::setFloat(const std::string& name, float value) const
 
 void Shader::setMat4(const std::string& name, const glm::mat4& value) const
 {
-    glUniformMatrix4fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE, glm::value_ptr(value));
+	int location = glGetUniformLocation(ID, name.c_str());
+	if (location == -1) {
+		std::cerr << "[WARNING] Uniform '" << name << "' not found or inactive." << std::endl;
+		return;
+	}
+
+	if (glm::any(glm::isnan(value[0])) || glm::any(glm::isnan(value[1])) ||
+		glm::any(glm::isnan(value[2])) || glm::any(glm::isnan(value[3]))) {
+		std::cerr << "[FATAL] Uniform '" << name << "' contains NaN matrix, skipping set." << std::endl;
+		return;
+	}
+
+	glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(value));
 }
+
 
 ShaderProgramSource Shader::ParseShader(const std::string filepath)
 {
@@ -59,9 +72,9 @@ ShaderProgramSource Shader::ParseShader(const std::string filepath)
 	std::string line;
 	std::stringstream ss[2];
 	ShaderType type = ShaderType::NONE;
-	while (std::getline(stream,line))
+	while (std::getline(stream, line))
 	{
-		if (line.find("#shader")!= std::string::npos)
+		if (line.find("#shader") != std::string::npos)
 		{
 			if (line.find("vertex") != std::string::npos)
 				type = ShaderType::VERTEX;
@@ -73,14 +86,14 @@ ShaderProgramSource Shader::ParseShader(const std::string filepath)
 			ss[(int)type] << line << "\n";
 		}
 	}
-	return{ ss[0].str(), ss[1].str()};
+	return{ ss[0].str(), ss[1].str() };
 }
 
 unsigned int Shader::CompileShader(unsigned int type, const std::string& source)
 {
 	unsigned int id = glCreateShader(type);
 	const char* src = source.c_str();
-	glShaderSource(id,1,&src,nullptr);
+	glShaderSource(id, 1, &src, nullptr);
 	glCompileShader(id);
 
 	int result;
@@ -89,13 +102,13 @@ unsigned int Shader::CompileShader(unsigned int type, const std::string& source)
 	{
 		int length;
 		glGetShaderiv(id, GL_INFO_LOG_LENGTH, &length);
-		char* message = (char*)malloc(length * sizeof(char));
+		char* message = new char[length];
 		glGetShaderInfoLog(id, length, &length, message);
-
-		std::cout << "Failed to compile " << (type == GL_VERTEX_SHADER ? "vertex" : "fragment") << " shader" << std::endl;
-		std::cout << message << std::endl;
-
+		std::cout << "Failed to compile " << (type == GL_VERTEX_SHADER ? "vertex" : "fragment") << " shader\n"
+			<< message << std::endl;
+		delete[] message;
 		glDeleteShader(id);
+		return 0;
 	}
 
 	return id;
@@ -105,15 +118,15 @@ unsigned int Shader::CreateShader(const std::string& vertexShader, const std::st
 {
 	unsigned int program = glCreateProgram();
 	unsigned int vs = CompileShader(GL_VERTEX_SHADER, vertexShader);
-	unsigned int fs = CompileShader(GL_FRAGMENT_SHADER,fragmentShader);
+	unsigned int fs = CompileShader(GL_FRAGMENT_SHADER, fragmentShader);
 
 	if (vs == 0 || fs == 0) {
 		std::cerr << "[CreateShader] Shader compile failed!" << std::endl;
 		return 0;
 	}
 
-	glAttachShader(program,vs);
-	glAttachShader(program,fs);
+	glAttachShader(program, vs);
+	glAttachShader(program, fs);
 	glLinkProgram(program);
 
 	int success;
@@ -122,6 +135,7 @@ unsigned int Shader::CreateShader(const std::string& vertexShader, const std::st
 		char infoLog[512];
 		glGetProgramInfoLog(program, 512, NULL, infoLog);
 		std::cerr << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
+		return 0;
 	}
 
 
@@ -129,5 +143,4 @@ unsigned int Shader::CreateShader(const std::string& vertexShader, const std::st
 	glDeleteShader(fs);
 
 	return program;
-
 }
