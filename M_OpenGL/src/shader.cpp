@@ -41,19 +41,16 @@ void Shader::setFloat(const std::string& name, float value) const
 
 void Shader::setMat4(const std::string& name, const glm::mat4& value) const
 {
-	int location = glGetUniformLocation(ID, name.c_str());
-	if (location == -1) {
-		std::cerr << "[WARNING] Uniform '" << name << "' not found or inactive." << std::endl;
-		return;
-	}
+	glUniformMatrix4fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE, &value[0][0]);
+}
 
-	if (glm::any(glm::isnan(value[0])) || glm::any(glm::isnan(value[1])) ||
-		glm::any(glm::isnan(value[2])) || glm::any(glm::isnan(value[3]))) {
-		std::cerr << "[FATAL] Uniform '" << name << "' contains NaN matrix, skipping set." << std::endl;
-		return;
-	}
-
-	glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(value));
+void Shader::setVec3(const std::string& name, float x, float y, float z) const
+{
+	glUniform3f(glGetUniformLocation(ID, name.c_str()), x, y, z);
+}
+void Shader::setVec3(const std::string& name, const glm::vec3& value) const
+{
+	glUniform3fv(glGetUniformLocation(ID, name.c_str()), 1, &value[0]);
 }
 
 

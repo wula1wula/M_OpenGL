@@ -74,12 +74,8 @@ int main()
 	std::cout << "[DEBUG] Shader compiled and linked." << std::endl;
 
 	float vertices[] = {
-		//     ---- 位置 ----       ---- 颜色 ----     - 纹理坐标 -
-				// 0.5f,  0.5f, 0.0f,   1.0f, 1.0f, // top right
-				// 0.5f, -0.5f, 0.0f,   1.0f, 0.0f, // bottom right
-				//-0.5f, -0.5f, 0.0f,   0.0f, 0.0f, // bottom left
-				//-0.5f,  0.5f, 0.0f,   0.0f, 1.0f  // top left 
-					-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+		//  ---- 位置 ----       - 纹理坐标 -
+			-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
 			 0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
 			 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
 			 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,

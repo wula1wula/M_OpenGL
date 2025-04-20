@@ -27,7 +27,7 @@
     <ClCompile Include="src\vendor\glm\detail\glm.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="src\Application.cpp">
+    <ClCompile Include="src\Color_Application.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
@@ -366,6 +366,8 @@
     <None Include="src\vendor\glm\gtx\wrap.inl">
       <Filter>头文件</Filter>
     </None>
+    <None Include="res\Shader\ColorShader.shader" />
+    <None Include="res\Shader\lightShader.shader" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\shader.h">
@@ -818,6 +820,9 @@
       <Filter>资源文件</Filter>
     </Image>
     <Image Include="res\image\awesomeface.png">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\image\container2.png">
       <Filter>资源文件</Filter>
     </Image>
   </ItemGroup>
