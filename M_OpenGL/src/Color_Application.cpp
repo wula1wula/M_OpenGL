@@ -166,9 +166,14 @@ int main()
 
 	//加载纹理
 	unsigned int diffuseMap = loadTexture("res/image/container2.png");
+	unsigned int specularMap = loadTexture("res/image/container2_specular.png");
 
     m_light_shader.use();
 	m_light_shader.setInt("material.diffuse", 0);	
+    m_light_shader.setInt("material.specular",1);
+
+	//光源位置
+	glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
 
 	//循环渲染
 	while (!glfwWindowShouldClose(window))
@@ -228,9 +233,13 @@ int main()
 		glm::mat4 model = glm::mat4(1.0f);
 		m_light_shader.setMat4("model", model);
 
+
 		//纹理
         glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, diffuseMap);
+
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, specularMap);
 
 		//绘制
 		glBindVertexArray(VAO);
