@@ -119,6 +119,18 @@ int main()
     -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 0.0f,
     -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f
 	};
+	glm::vec3 cubePositions[] = {
+		glm::vec3(0.0f,  0.0f,  0.0f),
+		glm::vec3(2.0f,  5.0f, -15.0f),
+		glm::vec3(-1.5f, -2.2f, -2.5f),
+		glm::vec3(-3.8f, -2.0f, -12.3f),
+		glm::vec3(2.4f, -0.4f, -3.5f),
+		glm::vec3(-1.7f,  3.0f, -7.5f),
+		glm::vec3(1.3f, -2.0f, -2.5f),
+		glm::vec3(1.5f,  2.0f, -2.5f),
+		glm::vec3(1.5f,  0.2f, -1.5f),
+		glm::vec3(-1.3f,  1.0f, -1.5f)
+	};
 
 	//VAO VBO
 	unsigned int VBO;
@@ -166,20 +178,23 @@ int main()
 
 	//加载纹理
 	unsigned int diffuseMap = loadTexture("res/image/container2.png");
-	unsigned int specularMap = loadTexture("res/image/container2_specular.png");
+	unsigned int specularMap = loadTexture("res/image/lighting_maps_specular_color.png");
+	unsigned int emissionMap = loadTexture("res/image/matrix.jpg");
 
     m_light_shader.use();
 	m_light_shader.setInt("material.diffuse", 0);	
     m_light_shader.setInt("material.specular",1);
+	//m_light_shader.setInt("material.emission", 2);
 
 	//光源位置
-	glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
+	//glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
+
 
 	//循环渲染
 	while (!glfwWindowShouldClose(window))
 	{
 		//计算渲染时间
-		float currentFrame = glfwGetTime();
+		float currentFrame = static_cast<float>(glfwGetTime());
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 
@@ -187,14 +202,21 @@ int main()
 		processInput(window);
 
 		//渲染指令
-		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		//绘制三角形
 		m_light_shader.use();
 		//m_light_shader.setVec3("objectColor", 1.0f, 0.5f, 0.31f);
+
+		//m_light_shader.setVec3("light.position", lightPos);
+	
+		//m_light_shader.setVec3("light.direction", -0.2f,-1.0f,-0.3f);
 		
-		m_light_shader.setVec3("light.position", lightPos);
+		m_light_shader.setVec3("light.position", camera.Position);
+		m_light_shader.setVec3("light.direction", camera.Front);
+		m_light_shader.setFloat("light.cutOff", glm::cos(glm::radians(12.5f)));
+		m_light_shader.setFloat("light.outerCutOff", glm::cos(glm::radians(17.5f)));
 		m_light_shader.setVec3("viewPos", camera.Position);
 
 		//光源颜色
@@ -210,6 +232,9 @@ int main()
 		m_light_shader.setVec3("light.ambient", 0.2f, 0.2f, 0.2f);
 		m_light_shader.setVec3("light.diffuse", 0.5f, 0.5f, 0.5f);
         m_light_shader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
+		m_light_shader.setFloat("light.constant", 1.0f);
+		m_light_shader.setFloat("light.linear", 0.09f);
+		m_light_shader.setFloat("light.quadratic", 0.032f);
 		
 		//材质颜色
 		//m_light_shader.setVec3("material.ambient", 1.0f, 0.5f, 0.31f);
@@ -220,8 +245,8 @@ int main()
 		//m_light_shader.setVec3("material.diffuse", 0.0f, 0.50980392f, 0.50980392f);
 		//m_light_shader.setVec3("material.specular", 0.50196078f, 0.50196078f, 0.50196078f);
 		//m_light_shader.setFloat("material.shininess", 32.0f);
-		m_light_shader.setVec3("material.specular", 0.5f,0.5f,0.5f);
-        m_light_shader.setFloat("material.shininess", 64.0f);
+		//m_light_shader.setVec3("material.specular", 0.5f,0.5f,0.5f);
+        m_light_shader.setFloat("material.shininess", 32.0f);
 
 		//相机
 		glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
@@ -241,19 +266,43 @@ int main()
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, specularMap);
 
-		//绘制
-		glBindVertexArray(VAO);
-		glDrawArrays(GL_TRIANGLES, 0, 36);
+		//glActiveTexture(GL_TEXTURE2);
+		//glBindTexture(GL_TEXTURE_2D, emissionMap);
 
-		m_sunlight_shader.use();
+		//绘制
+		//glBindVertexArray(VAO);
+		//glDrawArrays(GL_TRIANGLES, 0, 36);
+
+		//m_sunlight_shader.use();
 		//m_sunlight_shader.setVec3("lightColor", lightColor);
-		m_sunlight_shader.setMat4("view", view);
+		//m_sunlight_shader.setMat4("view", view);
+		//m_sunlight_shader.setMat4("projection", projection);
+		//model = glm::mat4(1.0f);
+		//model = glm::translate(model, lightPos);
+		//model = glm::scale(model, glm::vec3(0.2f));
+		//m_sunlight_shader.setMat4("model", model);
+
+		glBindVertexArray(VAO);
+		for (unsigned int i = 0; i < 10; i++)
+		{
+			glm::mat4 model;
+			model = glm::translate(model, cubePositions[i]);
+			float angle = 20.0f * i;
+			model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+			m_light_shader.setMat4("model", model);
+
+			glDrawArrays(GL_TRIANGLES, 0, 36);
+		}
+
+
+        //绘制光源
+		m_sunlight_shader.use();
 		m_sunlight_shader.setMat4("projection", projection);
+		m_sunlight_shader.setMat4("view", view);
 		model = glm::mat4(1.0f);
 		model = glm::translate(model, lightPos);
 		model = glm::scale(model, glm::vec3(0.2f));
 		m_sunlight_shader.setMat4("model", model);
-
 		glBindVertexArray(lightVAO);
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 
