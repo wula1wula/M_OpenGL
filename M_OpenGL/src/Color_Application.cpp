@@ -131,6 +131,13 @@ int main()
 		glm::vec3(1.5f,  0.2f, -1.5f),
 		glm::vec3(-1.3f,  1.0f, -1.5f)
 	};
+	// positions of the point lights
+	glm::vec3 pointLightPositions[] = {
+		glm::vec3(0.7f,  0.2f,  2.0f),
+		glm::vec3(2.3f, -3.3f, -4.0f),
+		glm::vec3(-4.0f,  2.0f, -12.0f),
+		glm::vec3(0.0f,  0.0f, -3.0f)
+	};
 
 	//VAO VBO
 	unsigned int VBO;
@@ -213,11 +220,61 @@ int main()
 	
 		//m_light_shader.setVec3("light.direction", -0.2f,-1.0f,-0.3f);
 		
-		m_light_shader.setVec3("light.position", camera.Position);
-		m_light_shader.setVec3("light.direction", camera.Front);
-		m_light_shader.setFloat("light.cutOff", glm::cos(glm::radians(12.5f)));
-		m_light_shader.setFloat("light.outerCutOff", glm::cos(glm::radians(17.5f)));
+		//m_light_shader.setVec3("light.position", camera.Position);
+		//m_light_shader.setVec3("light.direction", camera.Front);
+		//m_light_shader.setFloat("light.cutOff", glm::cos(glm::radians(12.5f)));
+		//m_light_shader.setFloat("light.outerCutOff", glm::cos(glm::radians(17.5f)));
 		m_light_shader.setVec3("viewPos", camera.Position);
+		m_light_shader.setFloat("material.shininess", 32.0f);
+
+		// directional light
+		m_light_shader.setVec3("dirLight.direction", -0.2f, -1.0f, -0.3f);
+		m_light_shader.setVec3("dirLight.ambient", 0.05f, 0.05f, 0.05f);
+		m_light_shader.setVec3("dirLight.diffuse", 0.4f, 0.4f, 0.4f);
+		m_light_shader.setVec3("dirLight.specular", 0.5f, 0.5f, 0.5f);
+		// point light 1
+		m_light_shader.setVec3("pointLights[0].position", pointLightPositions[0]);
+		m_light_shader.setVec3("pointLights[0].ambient", 0.05f, 0.05f, 0.05f);
+		m_light_shader.setVec3("pointLights[0].diffuse", 0.8f, 0.8f, 0.8f);
+		m_light_shader.setVec3("pointLights[0].specular", 1.0f, 1.0f, 1.0f);
+		m_light_shader.setFloat("pointLights[0].constant", 1.0f);
+		m_light_shader.setFloat("pointLights[0].linear", 0.09f);
+		m_light_shader.setFloat("pointLights[0].quadratic", 0.032f);
+		// point light 2
+		m_light_shader.setVec3("pointLights[1].position", pointLightPositions[1]);
+		m_light_shader.setVec3("pointLights[1].ambient", 0.05f, 0.05f, 0.05f);
+		m_light_shader.setVec3("pointLights[1].diffuse", 0.8f, 0.8f, 0.8f);
+		m_light_shader.setVec3("pointLights[1].specular", 1.0f, 1.0f, 1.0f);
+		m_light_shader.setFloat("pointLights[1].constant", 1.0f);
+		m_light_shader.setFloat("pointLights[1].linear", 0.09f);
+		m_light_shader.setFloat("pointLights[1].quadratic", 0.032f);
+		// point light 3
+		m_light_shader.setVec3("pointLights[2].position", pointLightPositions[2]);
+		m_light_shader.setVec3("pointLights[2].ambient", 0.05f, 0.05f, 0.05f);
+		m_light_shader.setVec3("pointLights[2].diffuse", 0.8f, 0.8f, 0.8f);
+		m_light_shader.setVec3("pointLights[2].specular", 1.0f, 1.0f, 1.0f);
+		m_light_shader.setFloat("pointLights[2].constant", 1.0f);
+		m_light_shader.setFloat("pointLights[2].linear", 0.09f);
+		m_light_shader.setFloat("pointLights[2].quadratic", 0.032f);
+		// point light 4
+		m_light_shader.setVec3("pointLights[3].position", pointLightPositions[3]);
+		m_light_shader.setVec3("pointLights[3].ambient", 0.05f, 0.05f, 0.05f);
+		m_light_shader.setVec3("pointLights[3].diffuse", 0.8f, 0.8f, 0.8f);
+		m_light_shader.setVec3("pointLights[3].specular", 1.0f, 1.0f, 1.0f);
+		m_light_shader.setFloat("pointLights[3].constant", 1.0f);
+		m_light_shader.setFloat("pointLights[3].linear", 0.09f);
+		m_light_shader.setFloat("pointLights[3].quadratic", 0.032f);
+		// spotLight
+		m_light_shader.setVec3("spotLight.position", camera.Position);
+		m_light_shader.setVec3("spotLight.direction", camera.Front);
+		m_light_shader.setVec3("spotLight.ambient", 0.0f, 0.0f, 0.0f);
+		m_light_shader.setVec3("spotLight.diffuse", 1.0f, 1.0f, 1.0f);	
+		m_light_shader.setVec3("spotLight.specular", 1.0f, 1.0f, 1.0f);
+		m_light_shader.setFloat("spotLight.constant", 1.0f);
+		m_light_shader.setFloat("spotLight.linear", 0.09f);
+		m_light_shader.setFloat("spotLight.quadratic", 0.032f);
+		m_light_shader.setFloat("spotLight.cutOff", glm::cos(glm::radians(12.5f)));
+		m_light_shader.setFloat("spotLight.outerCutOff", glm::cos(glm::radians(15.0f)));
 
 		//光源颜色
 		//glm::vec3 lightColor(1.0f,1.0f,1.0f);
@@ -229,12 +286,12 @@ int main()
 		//m_light_shader.setVec3("light.ambient", ambientColor);
 		//m_light_shader.setVec3("light.diffuse", diffuseColor);
         //m_light_shader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
-		m_light_shader.setVec3("light.ambient", 0.2f, 0.2f, 0.2f);
-		m_light_shader.setVec3("light.diffuse", 0.5f, 0.5f, 0.5f);
-        m_light_shader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
-		m_light_shader.setFloat("light.constant", 1.0f);
-		m_light_shader.setFloat("light.linear", 0.09f);
-		m_light_shader.setFloat("light.quadratic", 0.032f);
+		//m_light_shader.setVec3("light.ambient", 0.2f, 0.2f, 0.2f);
+		//m_light_shader.setVec3("light.diffuse", 0.5f, 0.5f, 0.5f);
+        //m_light_shader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
+		//m_light_shader.setFloat("light.constant", 1.0f);
+		//m_light_shader.setFloat("light.linear", 0.09f);
+		//m_light_shader.setFloat("light.quadratic", 0.032f);
 		
 		//材质颜色
 		//m_light_shader.setVec3("material.ambient", 1.0f, 0.5f, 0.31f);
@@ -246,7 +303,7 @@ int main()
 		//m_light_shader.setVec3("material.specular", 0.50196078f, 0.50196078f, 0.50196078f);
 		//m_light_shader.setFloat("material.shininess", 32.0f);
 		//m_light_shader.setVec3("material.specular", 0.5f,0.5f,0.5f);
-        m_light_shader.setFloat("material.shininess", 32.0f);
+        
 
 		//相机
 		glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
@@ -294,17 +351,23 @@ int main()
 			glDrawArrays(GL_TRIANGLES, 0, 36);
 		}
 
-
         //绘制光源
 		m_sunlight_shader.use();
 		m_sunlight_shader.setMat4("projection", projection);
 		m_sunlight_shader.setMat4("view", view);
-		model = glm::mat4(1.0f);
-		model = glm::translate(model, lightPos);
-		model = glm::scale(model, glm::vec3(0.2f));
-		m_sunlight_shader.setMat4("model", model);
 		glBindVertexArray(lightVAO);
-		glDrawArrays(GL_TRIANGLES, 0, 36);
+		//model = glm::mat4(1.0f);
+		//model = glm::translate(model, lightPos);
+		//model = glm::scale(model, glm::vec3(0.2f));
+		//m_sunlight_shader.setMat4("model", model);
+		
+		for (unsigned int i = 0; i < 4; i++) {
+			model = glm::mat4(1.0f);
+			model = glm::translate(model, pointLightPositions[i]);
+			model = glm::scale(model, glm::vec3(0.2f)); // Make it a smaller cube
+			m_sunlight_shader.setMat4("model", model);
+			glDrawArrays(GL_TRIANGLES, 0, 36);
+		}
 
 		//检查并调用事件，交换缓冲区
 		glfwSwapBuffers(window);

@@ -27,7 +27,7 @@
     <ClCompile Include="src\vendor\glm\detail\glm.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="src\Color_Application.cpp">
+    <ClCompile Include="src\depth_Application.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
@@ -368,6 +368,9 @@
     </None>
     <None Include="res\Shader\ColorShader.shader" />
     <None Include="res\Shader\lightShader.shader" />
+    <None Include="res\test\backpack\backpack.mtl" />
+    <None Include="res\Shader\model_loading.shader" />
+    <None Include="res\Shader\depth_testing.shader" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\shader.h">
@@ -811,6 +814,12 @@
     <ClInclude Include="src\camera.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="src\Mesh.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Model.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\image\container.jpg">
@@ -831,5 +840,32 @@
     <Image Include="res\image\lighting_maps_specular_color.png">
       <Filter>资源文件</Filter>
     </Image>
+    <Image Include="res\image\matrix.jpg">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\test\backpack\ao.jpg">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\test\backpack\diffuse.jpg">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\test\backpack\normal.png">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\test\backpack\roughness.jpg">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\test\backpack\specular.jpg">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\image\marble.jpg">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\image\metal.png">
+      <Filter>资源文件</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="res\test\backpack\source_attribution.txt" />
   </ItemGroup>
 </Project>
