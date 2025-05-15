@@ -371,6 +371,9 @@
     <None Include="res\test\backpack\backpack.mtl" />
     <None Include="res\Shader\model_loading.shader" />
     <None Include="res\Shader\depth_testing.shader" />
+    <None Include="res\Shader\blending.shader" />
+    <None Include="res\Shader\framebuffers.shader" />
+    <None Include="res\Shader\framebuffers_screen.shader" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\shader.h">
@@ -862,6 +865,30 @@
       <Filter>资源文件</Filter>
     </Image>
     <Image Include="res\image\metal.png">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\image\grass.png">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\image\blending_transparent_window.png">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\image\skybox\back.jpg">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\image\skybox\bottom.jpg">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\image\skybox\front.jpg">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\image\skybox\left.jpg">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\image\skybox\right.jpg">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\image\skybox\top.jpg">
       <Filter>资源文件</Filter>
     </Image>
   </ItemGroup>

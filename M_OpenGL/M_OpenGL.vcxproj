@@ -141,8 +141,11 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="res\Shader\Basic.shader" />
+    <None Include="res\Shader\blending.shader" />
     <None Include="res\Shader\ColorShader.shader" />
     <None Include="res\Shader\depth_testing.shader" />
+    <None Include="res\Shader\framebuffers.shader" />
+    <None Include="res\Shader\framebuffers_screen.shader" />
     <None Include="res\Shader\lightShader.shader" />
     <None Include="res\Shader\model_loading.shader" />
     <None Include="res\test\backpack\backpack.mtl" />
@@ -411,13 +414,21 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\image\awesomeface.png" />
+    <Image Include="res\image\blending_transparent_window.png" />
     <Image Include="res\image\container.jpg" />
     <Image Include="res\image\container2.png" />
     <Image Include="res\image\container2_specular.png" />
+    <Image Include="res\image\grass.png" />
     <Image Include="res\image\lighting_maps_specular_color.png" />
     <Image Include="res\image\marble.jpg" />
     <Image Include="res\image\matrix.jpg" />
     <Image Include="res\image\metal.png" />
+    <Image Include="res\image\skybox\back.jpg" />
+    <Image Include="res\image\skybox\bottom.jpg" />
+    <Image Include="res\image\skybox\front.jpg" />
+    <Image Include="res\image\skybox\left.jpg" />
+    <Image Include="res\image\skybox\right.jpg" />
+    <Image Include="res\image\skybox\top.jpg" />
     <Image Include="res\image\wall.jpg" />
     <Image Include="res\test\backpack\ao.jpg" />
     <Image Include="res\test\backpack\diffuse.jpg" />
